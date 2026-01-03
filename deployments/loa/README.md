@@ -2,6 +2,10 @@
 
 **Loan Origination Application (LOA)** data migration pipeline.
 
+**Status:** ✅ Complete | 55 tests passing
+
+---
+
 ## Overview
 
 | Attribute | Value |
@@ -13,6 +17,8 @@
 | **Transformation** | SPLIT 1 source → 2 targets |
 | **Dependency** | No wait - immediate trigger after ODP load |
 
+---
+
 ## File Format
 
 ```
@@ -21,6 +27,17 @@ HDR|LOA|Applications|{YYYYMMDD}
 {data_rows...}
 TRL|RecordCount={n}|Checksum={hash}
 ```
+
+**Example (Applications):**
+```
+HDR|LOA|Applications|20260101
+application_id,customer_id,amount,status,application_date
+APP001,CUST001,50000.00,APPROVED,2025-12-15
+APP002,CUST002,75000.00,PENDING,2025-12-16
+TRL|RecordCount=2|Checksum=def456
+```
+
+---
 
 ## Data Flow
 
@@ -53,49 +70,90 @@ TRL|RecordCount={n}|Checksum={hash}
             └────────────────────────────────┘
 ```
 
-## LOA vs EM Comparison
-
-| Aspect | EM | LOA |
-|--------|-----|-----|
-| Source Entities | 3 (Customers, Accounts, Decision) | 1 (Applications) |
-| ODP Tables | 3 | 1 |
-| FDP Tables | 1 (JOIN) | 2 (SPLIT) |
-| Dependency Wait | Yes (all 3 entities) | No (immediate) |
-| Transformation | 3 → 1 JOIN | 1 → 2 SPLIT |
+---
 
 ## Directory Structure
 
 ```
-loa/
-├── config/           # System configuration and constants
-├── schema/           # Entity schemas
-├── domain/           # BigQuery schemas
-├── validation/       # File and record validators
-├── pipeline/         # Beam pipeline
-├── orchestration/    # Airflow DAGs
-├── transformations/  # dbt models
-├── schemas/          # BigQuery JSON schemas
-├── infrastructure/   # Points to central terraform
-└── tests/            # Unit and integration tests
+deployments/loa/
+├── config/
+│   ├── __init__.py
+│   ├── settings.py          # SYSTEM_ID="LOA", datasets
+│   └── constants.py         # Headers, allowed values
+│
+├── schema/
+│   ├── __init__.py
+│   ├── applications.py      # ApplicationsSchema
+│   └── registry.py          # LOA_SCHEMAS
+│
+├── domain/
+│   ├── __init__.py
+│   └── schema.py            # BigQuery schemas
+│
+├── validation/
+│   ├── __init__.py
+│   ├── types.py             # ValidationResult
+│   ├── file_validator.py    # HDR/TRL validation
+│   ├── record_validator.py  # Field validation
+│   └── validator.py         # LOAValidator
+│
+├── pipeline/
+│   ├── __init__.py
+│   ├── loa_pipeline.py      # Main Beam pipeline
+│   ├── dag_template.py      # create_loa_dag()
+│   └── transforms.py        # Beam DoFns
+│
+├── orchestration/
+│   └── airflow/
+│       ├── dags/            # Airflow DAGs
+│       ├── sensors/         # PubSub sensors
+│       └── callbacks/       # Error handlers
+│
+├── transformations/
+│   └── dbt/
+│       └── models/
+│           ├── staging/loa/ # stg_loa_applications
+│           └── fdp/         # 2 targets (SPLIT)
+│
+├── schemas/                 # BigQuery JSON schemas
+│   ├── odp_loa_applications.json
+│   ├── fdp_loa_event_transaction_excess.json
+│   └── fdp_loa_portfolio_account_excess.json
+│
+└── tests/
+    ├── unit/                # Unit tests
+    └── data/                # Test data files
 ```
+
+---
 
 ## Quick Start
 
 ```bash
 # Run tests
-PYTHONPATH=. pytest deployments/loa/tests/unit/ -v
+cd deployments/loa
+bash run_tests.sh
 
+# Or with pytest directly
+PYTHONPATH=src pytest tests/unit -v
+```
+
+---
+
+## Validation
+
+```bash
 # Validate imports
 python -c "
-from deployments.loa.config import SYSTEM_ID, REQUIRED_ENTITIES
-from deployments.loa.schema import LOA_SCHEMAS, get_loa_schema
-from deployments.loa.validation import LOAValidator
-from deployments.loa.domain.schema import LOA_SCHEMAS as DOMAIN_SCHEMAS
+from loa.config import SYSTEM_ID
+from loa.schema import LOA_SCHEMAS
+from loa.validation import LOAValidator
 print('✅ All LOA imports OK')
 print(f'   SYSTEM_ID: {SYSTEM_ID}')
-print(f'   ENTITIES: {REQUIRED_ENTITIES}')
 "
 ```
+
+---
 
 ## dbt Commands
 
@@ -107,12 +165,36 @@ cd deployments/loa/transformations/dbt
 dbt compile --select staging
 dbt compile --select fdp
 
-# Run models
-dbt run --select staging
-dbt run --select fdp
+# Run models (SPLIT: 1 source → 2 targets)
+dbt run --select stg_loa_applications
+dbt run --select event_transaction_excess
+dbt run --select portfolio_account_excess
 
 # Test models
-dbt test --select staging
-dbt test --select fdp
+dbt test
 ```
+
+---
+
+## Key Difference from EM
+
+| Aspect | EM | LOA |
+|--------|-----|-----|
+| Entities | 3 | 1 |
+| Dependency | Wait for all | Immediate |
+| FDP Transformation | JOIN (3→1) | SPLIT (1→2) |
+| EntityDependencyChecker | Required | Not needed |
+
+---
+
+## Library Components Used
+
+| Component | Purpose |
+|-----------|---------|
+| `HDRTRLParser` | Parse header/trailer records |
+| `validate_record_count` | Verify TRL count matches |
+| `validate_checksum` | Verify data integrity |
+| `JobControlRepository` | Track pipeline runs |
+| `BasePipeline` | Beam pipeline base class |
+| `DAGFactory` | Generate Airflow DAGs |
 
