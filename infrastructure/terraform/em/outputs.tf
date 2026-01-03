@@ -1,4 +1,4 @@
-.y# EM (Excess Management) - Terraform Outputs
+# EM (Excess Management) - Terraform Outputs
 
 # ============================================================================
 # GCS BUCKETS
