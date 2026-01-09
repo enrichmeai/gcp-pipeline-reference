@@ -1,4 +1,4 @@
- # LOA (Loan Origination Application) - Terraform Main Configuration
+# LOA (Loan Origination Application) - Terraform Main Configuration
 #
 # Provisions complete GCP infrastructure for LOA pipeline:
 # - GCS buckets (landing, archive, error)
