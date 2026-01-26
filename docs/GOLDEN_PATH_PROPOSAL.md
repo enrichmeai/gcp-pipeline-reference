@@ -25,7 +25,7 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 *   **LOA (Loan Origination):** A high-speed, 1:1 mapping pattern for simpler entities.
 
 ## 3. Why This Should Be the Golden Path
-*   **Production Stability:** Over **660+ unit tests** ensuring the reliability of core migration logic.
+*   **Production Stability:** Over **1,000+ unit tests** ensuring the reliability of core migration logic.
 *   **Observability & Monitoring:** Built-in integration with Cloud Monitoring and Dynatrace via `gcp-pipeline-core`, providing real-time visibility into pipeline health and performance.
 *   **Compliance by Default:** Every row in BigQuery is automatically tagged with `_run_id` and `_source_file` for 100% lineage.
 *   **Rapid Onboarding:** We have established **standardized templates** and a **'Creating New Deployment' guide** that allows a new team to deploy a governed pipeline in days.
@@ -39,7 +39,7 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 
 Following up on your suggestion to take our migration framework to a **Golden Path**—I’ve put together a summary of our current production-ready assets and how they can serve as an enterprise standard.
 
-We have successfully abstracted the 'heavy lifting' of legacy migrations—including HDR/TRL validation, split-file handling, **real-time monitoring**, and FinOps tracking—into a **shared-library foundation**. This framework has already been proven through our **EM and LOA implementations** and is backed by over **660 unit tests**.
+We have successfully abstracted the 'heavy lifting' of legacy migrations—including HDR/TRL validation, split-file handling, **real-time monitoring**, and FinOps tracking—into a **shared-library foundation**. This framework has already been proven through our **EM and LOA implementations** and is backed by over **1,000 unit tests**.
 
 I believe this framework can significantly lower the barrier for other teams while ensuring consistent audit, security, and observability standards across the platform.
 
