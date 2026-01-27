@@ -23,11 +23,14 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 ### 2.3. Reference Implementations
 *   **EM (Excess Management):** Handles complex multi-entity joins and multi-target transformation.
 *   **LOA (Loan Origination):** A high-speed, 1:1 mapping pattern for simpler entities.
+*   **Spanner Transformation:** A reference implementation for modern cloud sources using dbt Federated Queries.
 
 ## 3. Why This Should Be the Golden Path
+*   **Multi-Source Flexibility:** Proven patterns for both legacy **Teradata-to-GCP** (via GCS/Beam) and **Spanner-to-BigQuery**. We support two distinct Spanner paths: **Low-Friction Federated Queries** for medium data and **High-Volume Beam Ingestion** for enterprise-scale migrations, ensuring stability regardless of data size.
 *   **Production Stability:** Over **1,000+ unit tests** ensuring the reliability of core migration logic.
 *   **Observability & Monitoring:** Built-in integration with Cloud Monitoring and Dynatrace via `gcp-pipeline-core`, providing real-time visibility into pipeline health and performance.
 *   **Compliance by Default:** Every row in BigQuery is automatically tagged with `_run_id` and `_source_file` for 100% lineage.
+*   **Future-Proof Modularization:** A clear roadmap to move from system-specific code to a **"Generic Engine" model**, enabling "Zero-Code" onboarding via YAML manifests (see [Modularization Roadmap](./MODULARIZATION_AND_CONFIG_ROADMAP.md)).
 *   **Rapid Onboarding:** We have established **standardized templates** and a **'Creating New Deployment' guide** that allows a new team to deploy a governed pipeline in days.
 
 ---
@@ -37,13 +40,13 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 
 "Hi [EDP Owner Name],
 
-Following up on your suggestion to take our migration framework to a **Golden Path**—I’ve put together a summary of our current production-ready assets and how they can serve as an enterprise standard.
+Following up on your suggestion to take our migration framework to a **Golden Path**—I’ve put together a summary of our current production-ready assets and our vision for a **"Generic Engine" platform**.
 
-We have successfully abstracted the 'heavy lifting' of legacy migrations—including HDR/TRL validation, split-file handling, **real-time monitoring**, and FinOps tracking—into a **shared-library foundation**. This framework has already been proven through our **EM and LOA implementations** and is backed by over **1,000 unit tests**.
+We have successfully abstracted the 'heavy lifting' of legacy migrations—including HDR/TRL validation, split-file handling, **real-time monitoring**, and FinOps tracking—into a **shared-library foundation**. This framework has already been proven through our **EM, LOA, and new Spanner implementations**.
 
-I believe this framework can significantly lower the barrier for other teams while ensuring consistent audit, security, and observability standards across the platform.
+The key differentiator for this Golden Path is our **Modularization Roadmap**. We are moving toward a **Manifest-Driven model** where onboarding a new system requires zero new Python code—only a YAML configuration. This will significantly lower the barrier for other teams while ensuring 100% consistent audit and observability standards across the bank.
 
-I’d love to show you a 15-minute walkthrough of the **'Job Control' metadata layer**, our **monitoring dashboards**, and our **Onboarding Templates**. Do you have any time next week for a brief demo?
+I’d love to show you a 15-minute walkthrough of our **'Job Control' metadata layer**, the **Universal Engine vision**, and our **Spanner-to-FDP reference implementation**. Do you have any time next week for a brief demo?
 
 Best regards,
 
