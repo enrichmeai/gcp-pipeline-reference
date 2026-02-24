@@ -21,8 +21,8 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 3.  **Orchestration Unit:** Cloud Composer (Airflow) for event-driven coordination.
 
 ### 2.3. Reference Implementations
-*   **Application1 (Excess Management):** Handles complex multi-entity joins and multi-target transformation.
-*   **Application2 (Loan Origination):** A high-speed, 1:1 mapping pattern for simpler entities.
+*   **Generic (Excess Management):** Handles complex multi-entity joins and multi-target transformation.
+*   **Generic (Loan Origination):** A high-speed, 1:1 mapping pattern for simpler entities.
 *   **Spanner Transformation:** A reference implementation for modern cloud sources using dbt Federated Queries.
 
 ## 3. Why This Should Be the Golden Path
@@ -30,7 +30,7 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 *   **Production Stability:** Over **1,000+ unit tests** ensuring the reliability of core migration logic.
 *   **Observability & Monitoring:** Built-in integration with Cloud Monitoring and Dynatrace via `gcp-pipeline-core`, providing real-time visibility into pipeline health and performance.
 *   **Compliance by Default:** Every row in BigQuery is automatically tagged with `_run_id` and `_source_file` for 100% lineage.
-*   **Future-Proof Modularization:** A clear roadmap to move from systapplication1-specific code to a **"Generic Engine" model**, enabling "Zero-Code" onboarding via YAML manifests (see [Modularization Roadmap](./MODULARIZATION_AND_CONFIG_ROADMAP.md)).
+*   **Future-Proof Modularization:** A clear roadmap to move from systgeneric-specific code to a **"Generic Engine" model**, enabling "Zero-Code" onboarding via YAML manifests (see [Modularization Roadmap](./MODULARIZATION_AND_CONFIG_ROADMAP.md)).
 *   **Rapid Onboarding:** We have established **standardized templates** and a **'Creating New Deployment' guide** that allows a new team to deploy a governed pipeline in days.
 
 ---
@@ -42,7 +42,7 @@ A decoupled architecture that minimizes blast radius and optimizes cloud costs:
 
 Following up on your suggestion to take our migration framework to a **Golden Path**—I’ve put together a summary of our current production-ready assets and our vision for a **"Generic Engine" platform**.
 
-We have successfully abstracted the 'heavy lifting' of legacy migrations—including HDR/TRL validation, split-file handling, **real-time monitoring**, and FinOps tracking—into a **shared-library foundation**. This framework has already been proven through our **Application1, Application2, and new Spanner implementations**.
+We have successfully abstracted the 'heavy lifting' of legacy migrations—including HDR/TRL validation, split-file handling, **real-time monitoring**, and FinOps tracking—into a **shared-library foundation**. This framework has already been proven through our **Generic, Generic, and new Spanner implementations**.
 
 The key differentiator for this Golden Path is our **Modularization Roadmap**. We are moving toward a **Manifest-Driven model** where onboarding a new system requires zero new Python code—only a YAML configuration. This will significantly lower the barrier for other teams while ensuring 100% consistent audit and observability standards across the bank.
 
