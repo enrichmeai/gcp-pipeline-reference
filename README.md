@@ -2,7 +2,7 @@
 
 A **reference implementation** of a mainframe-to-GCP data pipeline, demonstrating standardised "Golden Path" patterns for the enterprise Credit Platform. It consolidates what were previously separate applications (Excess Management and Loan Origination) into a single **Generic** reference system, proving two distinct pipeline patterns simultaneously using a shared 3-unit deployment model.
 
-> **Last Updated:** March 2026 | **Version:** 1.0.6
+> **Last Updated:** March 2026 | **Version:** 1.0.7
 
 ---
 
@@ -239,7 +239,7 @@ This script:
 
 ### 5-Library Model (Published as `gcp-pipeline-framework`)
 
-Libraries are consumed from PyPI (`pip install gcp-pipeline-framework==1.0.6`) and are **not embedded** in this repository.
+Libraries are consumed from PyPI (`pip install gcp-pipeline-framework==1.0.7`) and are **not embedded** in this repository.
 
 ```
 gcp-pipeline-core (Foundation — no Beam, no Airflow)

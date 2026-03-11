@@ -12,7 +12,7 @@ The **Generic reference system** is the centrepiece of this proposal. It is a de
 
 ### 2.1 The Shared Library Foundation
 
-Enterprise logic has been abstracted into five versioned, reusable libraries published to PyPI under the umbrella package `gcp-pipeline-framework==1.0.6`:
+Enterprise logic has been abstracted into five versioned, reusable libraries published to PyPI under the umbrella package `gcp-pipeline-framework==1.0.7`:
 
 - `gcp-pipeline-core`: Centralised Audit, Job Control, and FinOps (Cost Tracking). Zero dependencies on Beam or Airflow.
 - `gcp-pipeline-beam`: Standardised Ingestion logic — HDR/TRL envelope validation, 25MB+ split-file handling, Dead Letter Queue side outputs.
