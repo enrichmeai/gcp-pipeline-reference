@@ -69,7 +69,7 @@ The Generic system proves that a single shared framework handles both the JOIN a
 ### 3.2 Multi-Source Flexibility
 
 The framework supports:
-- **Legacy Mainframe/Teradata to GCP** via GCS landing + Beam ingestion (proven in production).
+- **Mainframe/Teradata to GCP** via GCS landing + Beam ingestion (proven in production).
 - **Cloud Spanner to BigQuery** via two paths: low-friction federated queries for medium data volumes, and high-volume Beam ingestion for enterprise scale.
 
 ### 3.3 Production Stability
