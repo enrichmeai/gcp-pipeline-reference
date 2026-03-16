@@ -12,7 +12,7 @@ The **Generic reference system** is the centrepiece of this proposal. It is a de
 
 ### 2.1 The Shared Library Foundation
 
-Enterprise logic has been abstracted into five versioned, reusable libraries published to PyPI under the umbrella package `gcp-pipeline-framework==1.0.7`:
+Enterprise logic has been abstracted into five versioned, reusable libraries published to PyPI under the umbrella package `gcp-pipeline-framework==1.0.11`:
 
 - `gcp-pipeline-core`: Centralised Audit, Job Control, and FinOps (Cost Tracking). Zero dependencies on Beam or Airflow.
 - `gcp-pipeline-beam`: Standardised Ingestion logic — HDR/TRL envelope validation, 25MB+ split-file handling, Dead Letter Queue side outputs.
@@ -84,13 +84,87 @@ The framework supports:
 - Every BigQuery row is automatically tagged with `_run_id` and `_source_file` for 100% lineage from mainframe extract to FDP.
 - PII masking macros in `gcp-pipeline-transform` applied at the FDP layer.
 
-### 3.5 Rapid Onboarding
+### 3.5 Rapid Onboarding — Config-Driven Pipelines
 
-Standardised templates and a "Creating New Deployment" guide allow a new team to deploy a governed pipeline in days, not weeks. The DAGFactory pattern means new entities require only configuration, not new Airflow code.
+The entire pipeline is now driven by a single `config/system.yaml` file. A new team onboards by:
 
-### 3.6 Future-Proof Modularisation
+1. **Copy** the project structure
+2. **Edit** `config/system.yaml` — define system_id, entities (with full schemas), FDP models (with dependency type: `join` or `map`), and infrastructure naming
+3. **Write** dbt SQL models for their FDP transformations (the only business logic that can't be generated)
+4. **Deploy** — Terraform + workflow handle the rest
 
-A clear roadmap towards a "Generic Engine" model — enabling zero-code onboarding via YAML manifests — further reduces the barrier for new teams while ensuring 100% consistent audit and observability standards. See [Modularisation Roadmap](./MODULARIZATION_AND_CONFIG_ROADMAP.md).
+**No Python code editing. No DAG editing. No constants/settings file editing.**
+
+The config defines:
+
+| Section | What It Controls |
+|---------|-----------------|
+| `system_id` / `system_name` | System identification, file prefixes, resource naming |
+| `entities` | ODP table schemas, CSV headers, field validation rules, PII flags, foreign keys |
+| `fdp_models` | FDP transformation targets, dependency type (`join`/`map`), required ODP entities |
+| `infrastructure` | Dataset names, bucket naming conventions, Pub/Sub topics |
+
+Under the hood:
+- **Ingestion**: `schema/registry.py` loads YAML → builds `EntitySchema` objects (same API, config-driven backend)
+- **Orchestration**: `dag_factory.py` reads YAML → generates DAGs dynamically with correct FDP dependency logic
+- **Settings**: `config/settings.py` loads infrastructure section from YAML
+
+Full specification: [CONFIG_DRIVEN_PIPELINE_SPEC.md](./CONFIG_DRIVEN_PIPELINE_SPEC.md)
+
+### 3.6 Granular FDP Dependency Management
+
+The transformation layer uses per-model dependency checking, not all-or-nothing:
+
+| FDP Model | Type | ODP Dependencies | Trigger Behaviour |
+|-----------|------|------------------|-------------------|
+| `event_transaction_excess` | JOIN | customers + accounts | Triggers only when **both** are loaded |
+| `portfolio_account_excess` | MAP | decision | Triggers **immediately** when decision loads |
+| `portfolio_account_facility` | MAP | applications | Triggers **immediately** when applications loads |
+
+This is defined in `system.yaml` under `fdp_models` and consumed by the DAG factory — no DAG code changes needed when adding new FDP models.
+
+### 3.7 Config-Driven dbt Model Generation
+
+The transformation layer (FDP and CDP) is now config-driven via a generator script:
+
+```bash
+# Generate FDP models (ODP → FDP)
+python generate_dbt_models.py --layer fdp --config config/system.yaml
+
+# Generate CDP scaffolding (FDP → CDP)
+python generate_dbt_models.py --layer cdp --config config/system.yaml
+```
+
+**FDP layer** — MAP and JOIN models are 100% auto-generated from `system.yaml`:
+- ODP staging views with code maps and renames
+- FDP SQL models with surrogate keys, column mappings, PII masking, incremental filters
+- Source definitions with column-level tests
+- Model metadata YAML
+
+**CDP layer** — scaffolding is auto-generated, but CDP SQL is hand-written:
+- FDP staging views (thin passthroughs from FDP tables) — auto-generated
+- FDP source definitions with tests — auto-generated
+- CDP model metadata — auto-generated
+- **CDP SQL with complex business logic** — hand-written by the team
+
+This reflects reality: FDP is standardised data transformation (YAML-configurable), while CDP involves complex business logic (aggregations, scoring, segmentation) that requires hand-written SQL.
+
+Full specification: [DBT_CONFIG_DRIVEN_SPEC.md](./DBT_CONFIG_DRIVEN_SPEC.md)
+
+### 3.8 No Library Changes Required
+
+All config-driven logic lives at the deployment level. The published `gcp-pipeline-framework` libraries remain unchanged:
+
+| What | Where | Team Edits? |
+|------|-------|------------|
+| `system.yaml` | Per-deployment config | Yes — define entities, models, infrastructure |
+| `generate_dbt_models.py` | Deployment-level script | No — copy as-is |
+| `gcp-pipeline-framework` | PyPI (shared libraries) | **No** — provides the engine |
+
+### 3.9 Future Modularisation
+
+- **Auto-generate Terraform** from `system.yaml` infrastructure section
+- **Auto-generate test data** from entity schema definitions
 
 ---
 
