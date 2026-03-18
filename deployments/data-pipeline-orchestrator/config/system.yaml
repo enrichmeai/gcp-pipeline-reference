@@ -9,7 +9,7 @@
 system_id: GENERIC
 system_name: Generic
 file_prefix: generic
-ok_file_suffix: ".ok"
+ok_file_suffix: ".csv"
 
 # =============================================================================
 # ENTITIES — which entities to ingest (names + descriptions only)
