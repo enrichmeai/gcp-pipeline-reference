@@ -106,7 +106,7 @@ The config defines:
 
 Under the hood:
 - **Ingestion**: `schema/registry.py` loads YAML → builds `EntitySchema` objects (same API, config-driven backend)
-- **Orchestration**: `dag_factory.py` reads YAML → generates DAGs dynamically with correct FDP dependency logic
+- **Orchestration**: `generate_dags.py` reads YAML → produces 5 static DAG files at build time (trigger, ingestion, transformation, status, error handling) with full observability stack
 - **Settings**: `config/settings.py` loads infrastructure section from YAML
 
 Full specification: [CONFIG_DRIVEN_PIPELINE_SPEC.md](./CONFIG_DRIVEN_PIPELINE_SPEC.md)
